@@ -20,7 +20,37 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize Application
     const init = async () => {
         renderPersonaTabs();
-        await loadWeather(weatherData.location.latitude, weatherData.location.longitude, weatherData.location.name);
+
+        // Check for saved location in localStorage or load default
+        const savedLoc = localStorage.getItem("mausam_saved_loc");
+        if (savedLoc) {
+            try {
+                const parsed = JSON.parse(savedLoc);
+                await loadWeather(parsed.lat, parsed.lon, parsed.name);
+            } catch(e) {
+                await loadWeather(weatherData.location.latitude, weatherData.location.longitude, weatherData.location.name);
+            }
+        } else {
+            // Load default location initially with live data
+            await loadWeather(weatherData.location.latitude, weatherData.location.longitude, weatherData.location.name);
+            
+            // Non-blocking attempt to ask for GPS if user permits
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (pos) => {
+                        const lat = pos.coords.latitude;
+                        const lon = pos.coords.longitude;
+                        const detectedName = await WeatherService.reverseGeocode(lat, lon);
+                        await loadWeather(lat, lon, detectedName);
+                    },
+                    () => {
+                        // User declined or silent ignore, keep default
+                    },
+                    { timeout: 5000 }
+                );
+            }
+        }
+
         setupEventListeners();
         animateEntrance();
     };
@@ -29,6 +59,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const loadWeather = async (lat, lon, name) => {
         try {
             weatherData = await WeatherService.fetchLiveData(lat, lon, name);
+            // Save last loaded location
+            localStorage.setItem("mausam_saved_loc", JSON.stringify({ lat, lon, name }));
+
             updateCoreWeatherUI();
             renderPersonaContent();
             updateWindNeedle();
@@ -68,7 +101,14 @@ document.addEventListener("DOMContentLoaded", () => {
         // Header location & date
         const locationTitle = document.getElementById("locationTitle");
         const locationDate = document.getElementById("locationDate");
+        const liveIndicator = document.getElementById("liveIndicator");
+
         if (locationTitle) locationTitle.innerText = `📍 ${weatherData.location.name}`;
+        if (liveIndicator) {
+            liveIndicator.innerText = weatherData.is_live ? "🟢 LIVE DATA" : "⚪ CACHED";
+            liveIndicator.style.color = weatherData.is_live ? "#4caf50" : "#ffd84d";
+        }
+
         if (locationDate) {
             const today = new Date();
             const dateStr = today.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', {
@@ -126,9 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (moonriseEl) moonriseEl.innerText = weatherData.sun_moon.moonrise;
         if (moonsetEl) moonsetEl.innerText = weatherData.sun_moon.moonset;
 
-        // Render Hourly
+        // Render Hourly & Daily
         renderHourly();
-        // Render 7-Day Forecast
         renderDaily();
     };
 
@@ -145,7 +184,6 @@ document.addEventListener("DOMContentLoaded", () => {
             </div>
         `).join("");
 
-        // Click handler for hourly
         document.querySelectorAll(".hour").forEach(h => {
             h.addEventListener("click", () => {
                 document.querySelectorAll(".hour").forEach(item => item.classList.remove("active"));
@@ -177,8 +215,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const renderPersonaContent = () => {
         if (!personaContentEl) return;
         const lang = PersonaEngine.getLang();
-        const t = PersonaEngine.TRANSLATIONS[lang];
-
         let html = "";
 
         // 1. Health & Allergy Card
@@ -344,20 +380,20 @@ document.addEventListener("DOMContentLoaded", () => {
                             <strong>${weatherData.location.name.split(',')[0]}</strong>
                             <small>${weatherData.current.temperature}°C | ${weatherData.current.weather_desc}</small>
                         </div>
-                        <div class="dest-card" onclick="alert('Switching to Mumbai weather...')">
+                        <div class="dest-card" onclick="window.searchCityDirect('Mumbai, Maharashtra, India', 19.076, 72.8777)">
                             <span>Mumbai</span>
-                            <strong>29.4°C</strong>
-                            <small>🌧️ Heavy Showers</small>
+                            <strong>Live View</strong>
+                            <small>Click to switch</small>
                         </div>
-                        <div class="dest-card" onclick="alert('Switching to Delhi weather...')">
+                        <div class="dest-card" onclick="window.searchCityDirect('New Delhi, Delhi, India', 28.6139, 77.209)">
                             <span>New Delhi</span>
-                            <strong>33.1°C</strong>
-                            <small>☀️ Sunny & Hazy</small>
+                            <strong>Live View</strong>
+                            <small>Click to switch</small>
                         </div>
-                        <div class="dest-card" onclick="alert('Switching to London weather...')">
-                            <span>London</span>
-                            <strong>17.5°C</strong>
-                            <small>🌦️ Light Rain (Carry Coat)</small>
+                        <div class="dest-card" onclick="window.searchCityDirect('Puri, Odisha, India', 19.8135, 85.8312)">
+                            <span>Puri Coastal</span>
+                            <strong>Live View</strong>
+                            <small>Click to switch</small>
                         </div>
                     </div>
 
@@ -400,8 +436,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <strong>07:00 AM – 08:30 AM</strong>
                             </div>
                             <div class="commute-body">
-                                <span class="temp">25°C ⛅</span>
-                                <p><strong>Dry & Pleasant.</strong> Safe for school bus & bicycle commutes. No raincoat needed for morning departure.</p>
+                                <span class="temp">${weatherData.hourly[0] ? weatherData.hourly[0].temp : 26}°C ${weatherData.hourly[0] ? weatherData.hourly[0].icon : '⛅'}</span>
+                                <p><strong>Favorable Morning Window.</strong> Safe for school bus & bicycle commutes. Rain chance is minimal (${weatherData.hourly[0] ? weatherData.hourly[0].rain_pop : 15}%).</p>
                             </div>
                         </div>
 
@@ -411,15 +447,15 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <strong>01:30 PM – 03:30 PM</strong>
                             </div>
                             <div class="commute-body">
-                                <span class="temp">31°C 🌦️</span>
-                                <p><strong>35% Rain Probability.</strong> Warm and humid. Keep a foldable umbrella in your child’s school bag.</p>
+                                <span class="temp">${weatherData.current.temperature}°C ${weatherData.current.weather_icon}</span>
+                                <p><strong>Elevated Humidity (${weatherData.current.relative_humidity}%).</strong> Ensure children carry water bottles and keep a light umbrella in school bags.</p>
                             </div>
                         </div>
                     </div>
 
                     <div class="rain-alert-counter">
                         <span>🌧️ ${lang === 'hi' ? 'बारिश का अलर्ट:' : 'Rain Alert:'}</span>
-                        <p>${lang === 'hi' ? 'शाम 6:00 बजे के बाद हल्की गरज-चमक के साथ बारिश का अनुमान। शाम 5 बजे से पहले पार्क में खेलने का उपयुक्त समय।' : 'Light rain expected post 06:00 PM. Best outdoor playground time is between 04:00 PM and 05:30 PM.'}</p>
+                        <p>${lang === 'hi' ? 'शाम के समय हल्की गरज-चमक के साथ बारिश का अनुमान। शाम 5 बजे से पहले पार्क में खेलने का उपयुक्त समय।' : 'Scattered clouds and evening rain possible. Best outdoor playground hours are before 05:30 PM.'}</p>
                     </div>
                 </article>
             `;
@@ -444,7 +480,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <span class="icon">🌱</span>
                             <small>${lang === 'hi' ? 'सतही मिट्टी की नमी' : 'Topsoil Moisture (0-10cm)'}</small>
                             <strong>${ag.soil_moisture_surface}%</strong>
-                            <div class="meter-bar"><div class="fill green" style="width: ${ag.soil_moisture_surface}%"></div></div>
+                            <div class="meter-bar"><div class="fill green" style="width: ${Math.min(100, ag.soil_moisture_surface)}%"></div></div>
                             <p>${agroAdv.soil_status}</p>
                         </div>
 
@@ -459,14 +495,14 @@ document.addEventListener("DOMContentLoaded", () => {
                             <span class="icon">💨</span>
                             <small>${lang === 'hi' ? 'वाष्पोत्सर्जन दर' : 'Evapotranspiration (ET₀)'}</small>
                             <strong>${ag.evapotranspiration} mm/day</strong>
-                            <p>Moderate crop water loss</p>
+                            <p>Daily crop water evaporation</p>
                         </div>
 
                         <div class="agro-card">
-                            <span class="icon">❄️</span>
-                            <small>${lang === 'hi' ? 'पाला / शीत जोखिम' : 'Frost / Heat Risk'}</small>
-                            <strong style="color: #4caf50">${ag.frost_risk}</strong>
-                            <p>Ideal vegetative conditions</p>
+                            <span class="icon">🌡️</span>
+                            <small>${lang === 'hi' ? 'मिट्टी का तापमान' : 'Soil Temperature'}</small>
+                            <strong style="color: #ffd84d">${ag.soil_temperature}°C</strong>
+                            <p>Favorable germination range</p>
                         </div>
                     </div>
 
@@ -484,7 +520,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // 7. Commuters Card
         if (currentPersona === "all" || currentPersona === "commuter") {
-            const com = PersonaEngine.calculateCommuteImpact(weatherData.current.visibility, weatherData.hourly[3].rain_pop);
+            const com = PersonaEngine.calculateCommuteImpact(weatherData.current.visibility, weatherData.hourly[3] ? weatherData.hourly[3].rain_pop : 30);
             html += `
                 <article class="card persona-card animate-card">
                     <div class="section-title">
@@ -492,7 +528,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             <h2>🚗 ${lang === 'hi' ? 'दैनिक यात्री एवं सड़क यातायात' : 'Commuter & Traffic Weather Impact'}</h2>
                             <p>${lang === 'hi' ? 'कोहरा, दृश्यता, जलभराव जोखिम एवं यात्रा में देरी की संभावना' : 'Road Visibility, Fog Risk, Waterlogging Potential & Transit Alerts'}</p>
                         </div>
-                        <span class="badge badge-green">Transit Score: 88/100</span>
+                        <span class="badge badge-green">Transit Score: ${weatherData.commute.transit_safety_score}/100</span>
                     </div>
 
                     <div class="commute-metrics-grid">
@@ -506,15 +542,15 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div class="commute-status-box">
                             <span class="icon">🌊</span>
                             <small>${lang === 'hi' ? 'जलभराव जोखिम' : 'Waterlogging Probability'}</small>
-                            <strong style="color: #4caf50">${com.waterlogging_risk}</strong>
-                            <p>Key arterial flyovers clear</p>
+                            <strong style="color: #4caf50">${weatherData.commute.waterlogging_risk}</strong>
+                            <p>Primary arterial roads clear</p>
                         </div>
 
                         <div class="commute-status-box">
                             <span class="icon">🚦</span>
                             <small>${lang === 'hi' ? 'यातायात प्रभाव' : 'Traffic Weather Impact'}</small>
-                            <strong>${com.traffic_impact}</strong>
-                            <p>Expect normal metro & road speed</p>
+                            <strong>${weatherData.commute.traffic_weather_impact}</strong>
+                            <p>Standard commute conditions</p>
                         </div>
                     </div>
                 </article>
@@ -549,12 +585,12 @@ document.addEventListener("DOMContentLoaded", () => {
                             <div class="slot-item recommended">
                                 <span>⭐ 04:30 PM – 07:00 PM</span>
                                 <strong>Sunset Golden Hour Ceremony</strong>
-                                <small>Temp: 27°C | Low UV | Breeze: 6 km/h</small>
+                                <small>Temp: ~${Math.round(weatherData.current.temperature - 1)}°C | Low UV | Breeze: ${weatherData.current.wind_speed} km/h</small>
                             </div>
                             <div class="slot-item caution">
                                 <span>⚠️ 08:30 PM – 11:30 PM</span>
                                 <strong>Late Banquet & Dinner</strong>
-                                <small>Light rain chance (45%) — recommend canopy cover</small>
+                                <small>Humidity ${weatherData.current.relative_humidity}% — canopy/ventilated tent recommended</small>
                             </div>
                         </div>
                     </div>
@@ -564,6 +600,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         personaContentEl.innerHTML = html;
         animateEntrance();
+    };
+
+    // Helper for direct city switch from saved cards
+    window.searchCityDirect = async (name, lat, lon) => {
+        await loadWeather(lat, lon, name);
     };
 
     // Needle Rotation
@@ -609,9 +650,9 @@ document.addEventListener("DOMContentLoaded", () => {
         let text = "";
 
         if (lang === "hi") {
-            text = `${weatherData.location.name} में वर्तमान मौसम। तापमान ${cur.temperature} डिग्री सेल्सियस है, ${cur.weather_desc}। आर्द्रता ${cur.relative_humidity} प्रतिशत है। वायु गुणवत्ता सूचकांक ${weatherData.air_quality.aqi} के साथ ${weatherData.air_quality.status} है। आज दौड़ने और व्यायाम के लिए सबसे अच्छा समय सुबह 5 से 7 बजे का है। शाम को हल्की गरज-चमक की चेतावनी है, कृपया सुरक्षित रहें।`;
+            text = `${weatherData.location.name} में वर्तमान मौसम। तापमान ${cur.temperature} डिग्री सेल्सियस है, ${cur.weather_desc}। आर्द्रता ${cur.relative_humidity} प्रतिशत है। वायु गुणवत्ता सूचकांक ${weatherData.air_quality.aqi} के साथ ${weatherData.air_quality.status} है। आज दौड़ने और व्यायाम के लिए सबसे अच्छा समय सुबह 5 से 7 बजे का है। शाम को सतर्क रहें।`;
         } else {
-            text = `Mausam Weather Bulletin for ${weatherData.location.name}. Current temperature is ${cur.temperature} degrees Celsius with ${cur.weather_desc}. Humidity is ${cur.relative_humidity} percent, and wind speed is ${cur.wind_speed} kilometers per hour. Air Quality is ${weatherData.air_quality.status} with an AQI of ${weatherData.air_quality.aqi}. Optimal workout hours are between 5 and 7 AM. Stay safe and be alert for evening light thunderstorms.`;
+            text = `Live Mausam Weather Bulletin for ${weatherData.location.name}. Current temperature is ${cur.temperature} degrees Celsius with ${cur.weather_desc}. Humidity is ${cur.relative_humidity} percent, and wind speed is ${cur.wind_speed} kilometers per hour. Air Quality is ${weatherData.air_quality.status} with an AQI of ${weatherData.air_quality.aqi}. Optimal workout hours are early morning between 5 and 7 AM.`;
         }
 
         const utterance = new SpeechSynthesisUtterance(text);
@@ -664,20 +705,24 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         }
 
-        // GPS Geolocation Button
+        // GPS Geolocation Button with Reverse Geocoding
         if (gpsBtn) {
             gpsBtn.addEventListener("click", () => {
                 if (navigator.geolocation) {
-                    gpsBtn.innerText = "⏳";
+                    gpsBtn.innerText = "⏳ Locating...";
                     navigator.geolocation.getCurrentPosition(
                         async (pos) => {
-                            gpsBtn.innerText = "📍";
-                            await loadWeather(pos.coords.latitude, pos.coords.longitude, "My Current Location");
+                            const lat = pos.coords.latitude;
+                            const lon = pos.coords.longitude;
+                            const detectedName = await WeatherService.reverseGeocode(lat, lon);
+                            gpsBtn.innerText = "📍 GPS";
+                            await loadWeather(lat, lon, detectedName);
                         },
                         (err) => {
-                            gpsBtn.innerText = "📍";
-                            alert("Unable to retrieve location. Please check browser permissions or search manually.");
-                        }
+                            gpsBtn.innerText = "📍 GPS";
+                            alert("Location access denied or unavailable. Please search your city manually in the search box.");
+                        },
+                        { timeout: 10000, enableHighAccuracy: true }
                     );
                 } else {
                     alert("Geolocation is not supported by your browser.");
@@ -721,7 +766,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 }, 300);
             });
 
-            // Close search results when clicking outside
             document.addEventListener("click", (e) => {
                 if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
                     searchResults.style.display = "none";

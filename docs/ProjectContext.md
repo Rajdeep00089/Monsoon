@@ -1,0 +1,20 @@
+PSID: 26076
+Idea Title: Development of personalized homepage for 'Mausam' mobile
+application.
+Description:
+• Health-conscious users Highlight Air Quality Index (AQI), pollen count, UV index, and humidity levels to help
+users manage allergies, asthma, or skin sensitivity.
+• Outdoor fitness enthusiasts Show sunrise/sunset times, 'best running hours,' wind speed, and heat alerts to
+optimize workout planning.
+• Beachgoers &amp; surfers Display sea conditions, tide timings, wave height, and water temperature for safe
+and enjoyable beach activities.
+• Travelers Provide quick access to saved destinations, severe weather alerts for flights, and packing
+suggestions (e.g., 'Carry a raincoat in London').
+• Parents &amp; families Emphasize school commute conditions, rain alerts, and severe weather warnings to
+plan daily routines.
+• Agriculture &amp; gardeners Show soil moisture, rainfall predictions, frost alerts, and seasonal planting
+guidance.
+• Commuters Integrate weather with traffic updates, visibility conditions, and alerts for storms or fog that affect
+travel.
+• Event planners Offer extended forecasts, probability of rain, and 'comfort index' for outdoor gatherings or
+weddings.

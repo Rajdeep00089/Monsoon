@@ -1,80 +1,84 @@
-﻿# 🌦️ Mausam (Monsoon) — Weather Dashboard
+# 🌦️ Mausam (मौसम) — Personalized Weather Experience
 > **Smart India Hackathon (SIH 2026) | Problem Statement ID: 26076**  
-> *Development of personalized homepage for 'Mausam' mobile application.*
+> **Idea Title:** *Development of personalized homepage for 'Mausam' mobile application.*  
+> **Tech Stack:** Pure Semantic HTML5, CSS3 (Glassmorphic Design System), Vanilla JavaScript (ES6+) — Zero External Dependencies.
 
 ---
 
-## 📌 Project Overview
-**Mausam** is a modern, responsive, and personalized weather dashboard application crafted with **pure HTML5, CSS3, and JavaScript**. Designed to transform the traditional weather reporting experience, Mausam adapts to the distinct lifestyle needs of diverse user groups across India.
+## 🌟 Executive Overview
+**Mausam (मौसम)** transforms traditional weather forecasting from raw data charts into a **hyper-personalized, citizen-centric intelligence hub**. Built strictly for **PSID 26076**, it dynamically tailors meteorological data to eight distinct Indian lifestyle and occupational segments.
+
+Whether you are a farmer in rural Bengal timing your paddy transplanting, an asthmatic managing dangerous PM2.5 spikes, a parent tracking school bus drop-off windows, or a tourist planning a trip to Mumbai, Mausam reorganizes its interface to present the insights that matter most to you.
 
 ---
 
-## 🎯 Targeted Personas (PSID 26076)
-The application architecture is designed around 8 dedicated user segments:
+## 🎯 The 8 Targeted Personas (PSID 26076 Compliant)
 
-1. **🩺 Health-Conscious Users**  
-   Highlights Air Quality Index (AQI from CPCB), $PM_{2.5}$ / $PM_{10}$ metrics, pollen counts, and UV index to help manage allergies, respiratory health, and skin sensitivity.
+```
++-------------------------------------------------------------------------------+
+|                             MAUSAM HOMEPAGE                                  |
+|   [ All-in-One ] [ 🩺 Health ] [ 🏃 Fitness ] [ 🏖️ Beach ] [ ✈️ Travel ]      |
+|   [ 🎒 Parents ] [ 🌾 Kisan ]  [ 🚗 Commute ] [ 🎪 Event ]                   |
++-------------------------------------------------------------------------------+
+```
 
-2. **🏃 Outdoor Fitness Enthusiasts**  
-   Displays solar cycles (sunrise/sunset), 'best running hours' calculations, wind velocity, and heat alerts to optimize workout routines.
+| Persona | Key Features & Algorithms | SIH 2026 Impact |
+| :--- | :--- | :--- |
+| **1. 🩺 Health-Conscious** | • CPCB National AQI Meter<br>• $PM_{2.5}$, $PM_{10}$, $NO_2$, $O_3$ breakdowns<br>• Pollen counts (Tree, Grass, Weed)<br>• Dynamic Asthma & Allergy Advisory | Helps sensitive individuals prevent respiratory attacks and plan safe outdoor hours. |
+| **2. 🏃 Outdoor Fitness** | • **"Best Running Hours" Algorithm (0–100 score)**<br>• Heat Exhaustion / WBGT Index<br>• Solar Golden Hour countdown<br>• Hydration & wind resistance advisory | Optimizes athletes' workout windows avoiding mid-day heatwaves and pollution peaks. |
+| **3. 🏖️ Beachgoers & Surfers** | • Coastal Tide Cycle (High / Low Tides with heights)<br>• Wave Swell Height (m) & Period (s)<br>• Water Temperature & Surf Direction<br>• **Beach Safety Flag Rating** (🟢 Safe / 🟡 Caution / 🔴 Danger) | Saves lives along coastal recreation belts like Puri, Goa, and Marina Beach. |
+| **4. ✈️ Travelers** | • Multi-city Saved Destinations (Live comparisons)<br>• Flight Weather Delay Risk index<br>• **AI-Driven Smart Packing Assistant** (auto-detects rain, cold, UV) | Eliminates packing guesswork and alerts passengers of weather-induced transit delays. |
+| **5. 🎒 Parents & Families** | • **Dedicated School Commute Windows** (Morning 7–8:30 AM & Afternoon 1:30–3:30 PM)<br>• Kids Outdoor Playground Safety Score (1–10)<br>• Rain Arrival Lead-Time countdown | Protects schoolchildren from sudden cloudbursts and extreme afternoon heat. |
+| **6. 🌾 Agriculture / Kisan** | • Topsoil Moisture ($0–10\text{ cm}$) & Subsoil status<br>• Evapotranspiration Rate ($\text{ET}_0$ in mm/day)<br>• 48-Hour Precipitation Volume<br>• **IMD Agromet Advisory** (Irrigation hold/release recommendations) | Prevents wasted irrigation and crop spoilage for Indian farmers. |
+| **7. 🚗 Daily Commuters** | • Fog Severity & Visibility Distance (km)<br>• Road Waterlogging & Flooding Risk<br>• Weather-Induced Traffic Congestion Score | Helps metro commuters choose optimal routes before getting stuck in rain snarls. |
+| **8. 🎪 Event Planners** | • **Outdoor Comfort Index (0–100 dial)**<br>• Precipitation Probability Timeline (PoP)<br>• Best Gathering & Wedding Ceremony Slot Finder | Guides event organizers on tenting requirements and optimal ceremony hours. |
 
-3. **🏖️ Beachgoers & Surfers**  
-   Tracks sea conditions, tide schedules (high/low tides), wave heights, and water temperatures for coastal recreation safety.
+---
 
-4. **✈️ Travelers**  
-   Enables multi-destination tracking, severe weather warnings for flights, and smart packing suggestions based on destination climate.
+## 🚀 Key Innovations & Differentiators
 
-5. **🎒 Parents & Families**  
-   Focuses on school commute conditions (morning and afternoon windows), rain alerts, and playground safety warnings.
-
-6. **🌾 Agriculture & Gardeners**  
-   Surfaces soil moisture levels, 14-day rainfall outlooks, frost alerts, and seasonal planting advice aligned with agrometeorological advisories.
-
-7. **🚗 Commuters**  
-   Integrates weather with visibility indicators, fog severity ratings, and alerts for waterlogging or storms affecting daily transit.
-
-8. **🎪 Event Planners**  
-   Offers extended precipitation probability, humidity levels, and outdoor comfort indices for weddings and outdoor gatherings.
+1. **🌐 Bilingual Support (English & हिंदी)**:  
+   One-click instant language switcher dynamically updates all weather descriptions, advisories, and persona names to support nationwide accessibility.
+2. **🔊 Voice Weather Bulletin (Web Speech API)**:  
+   Audio readout designed for farmers and visually impaired users. Reads out temperature, air quality, best running windows, and severe alerts in English or Hindi.
+3. **📱 Mobile App View Simulator**:  
+   Built-in simulator toggle to preview how Mausam functions as an Android / iOS mobile application.
+4. **⚡ Live Open-Meteo Integration + High-Fidelity Fallback**:  
+   Pulls live meteorological, air quality, marine, and soil data without requiring any API keys or paid tiers. Includes full fallback data so presentations never break even offline.
+5. **🔍 Interactive Search & GPS**:  
+   Live geocoding search for Indian cities and districts, paired with one-click GPS coordinate detection.
 
 ---
 
 ## 📂 Project Structure
 ```
 Mausam/
-├── index.html              # Main application entrypoint
+├── index.html              # Main application entry point (GitHub Pages ready)
 ├── css/
-│   └── style.css           # Glassmorphic UI styles, animations, responsive breakpoints
+│   └── style.css           # Glassmorphism UI, persona card components & animations
 ├── js/
-│   └── script.js           # Interactive DOM handling, card animations, compass needle
+│   ├── app.js / script.js  # Main application coordinator & UI DOM binder
+│   ├── weatherService.js   # Open-Meteo API layer (Weather, AQI, Marine, Soil, Geocoding)
+│   └── personaData.js      # Persona intelligence algorithms & bilingual dictionary
 ├── docs/
-│   └── ProjectContext.md   # SIH 2026 Problem Statement specifications
-├── .gitignore              # Ignored files and system metadata
-└── README.md               # Project documentation
+│   └── ProjectContext.md   # SIH 2026 Problem Statement specifications (PSID 26076)
+├── .gitignore              # Clean ignore rules
+└── README.md               # Complete Hackathon documentation
 ```
 
 ---
 
-## 🚀 Getting Started
+## 💻 How to Run Locally
 
-### Local Setup
-Since Mausam uses pure HTML, CSS, and JavaScript, no complex build steps or dependencies are needed!
+Since Mausam is built using pure HTML5, CSS3, and JavaScript, no build tools (`npm`, `webpack`) or backend servers are required:
 
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/Rajdeep00089/Monsoon.git
    cd Monsoon
    ```
-2. **Launch the application:**
-   - Double-click `index.html` to open it in any web browser.
-   - Or use VS Code Live Server extension for instant hot-reload.
-
----
-
-## 🎨 Tech Stack
-- **Frontend:** Pure Semantic HTML5
-- **Styling:** CSS3 (Modern Glassmorphism, CSS Grid, Flexbox, Keyframe Animations)
-- **Scripting:** Vanilla JavaScript (ES6+)
-- **Version Control:** Git & GitHub
+2. **Open in any browser:**
+   - Double-click `index.html` or open it with VS Code Live Server.
 
 ---
 

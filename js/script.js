@@ -87,6 +87,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.querySelectorAll(".persona-tab").forEach(t => t.classList.remove("active"));
                 tab.classList.add("active");
                 currentPersona = tab.getAttribute("data-id");
+
+                // Sync with bottom navigation
+                document.querySelectorAll(".bottom-nav-item").forEach(b => {
+                    b.classList.toggle("active", b.getAttribute("data-persona") === currentPersona);
+                });
+
                 renderPersonaContent();
             });
         });
@@ -782,6 +788,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 setTimeout(() => {
                     notification.classList.remove("show");
                 }, 3000);
+            });
+        }
+
+        // Mobile Bottom Navigation clicks
+        document.querySelectorAll(".bottom-nav-item").forEach(item => {
+            item.addEventListener("click", () => {
+                document.querySelectorAll(".bottom-nav-item").forEach(b => b.classList.remove("active"));
+                item.classList.add("active");
+                const personaId = item.getAttribute("data-persona");
+                currentPersona = personaId;
+
+                // Sync top tabs
+                document.querySelectorAll(".persona-tab").forEach(tab => {
+                    tab.classList.toggle("active", tab.getAttribute("data-id") === personaId);
+                });
+
+                renderPersonaContent();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // Register Service Worker for PWA (Mobile App Installation)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./service-worker.js').catch(err => {
+                    console.log("ServiceWorker registration skipped:", err);
+                });
             });
         }
     };

@@ -1,0 +1,17 @@
+{
+  "name": "Mausam - मौसम (SIH 2026)",
+  "short_name": "Mausam",
+  "description": "Personalized Weather Experience for 8 Personas - Smart India Hackathon 2026 (PSID 26076)",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#061b30",
+  "theme_color": "#0b3a63",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☀️</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

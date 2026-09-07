@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Mausam | Personalized Weather Experience (SIH 2026 - PSID 26076)</title>
     <meta name="description" content="Personalized Weather Dashboard for Mausam mobile application, supporting 8 user personas (Health, Fitness, Beach, Travel, Family, Kisan, Commuters, Event Planners).">
+    <meta name="theme-color" content="#0b3a63">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -360,6 +364,29 @@
         </div>
     </div>
 
+    <!-- Fixed Mobile Bottom Navigation Bar (Thumb Reach) -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav">
+        <button class="bottom-nav-item active" data-persona="all">
+            <span class="nav-icon">🏠</span>
+            <span>Home</span>
+        </button>
+        <button class="bottom-nav-item" data-persona="health">
+            <span class="nav-icon">🩺</span>
+            <span>Health</span>
+        </button>
+        <button class="bottom-nav-item" data-persona="agriculture">
+            <span class="nav-icon">🌾</span>
+            <span>Kisan</span>
+        </button>
+        <button class="bottom-nav-item" data-persona="fitness">
+            <span class="nav-icon">🏃</span>
+            <span>Fitness</span>
+        </button>
+        <button class="bottom-nav-item" data-persona="traveler">
+            <span class="nav-icon">✈️</span>
+            <span>Travel</span>
+        </button>
+    </nav>
 
     <!-- Application Scripts -->
     <script src="js/weatherService.js"></script>

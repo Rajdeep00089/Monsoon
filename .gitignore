@@ -11,3 +11,4 @@ desktop.ini
 
 # Logs and temporary files
 *.log
+.docs/
